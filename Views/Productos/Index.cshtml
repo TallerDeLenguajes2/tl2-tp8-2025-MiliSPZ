@@ -1,12 +1,16 @@
 @using Sistema
 @model List<Productos>
 
+<div class="d-flex justify-content-end">
+    <button type="button" class="btn btn-primary"><i class="bi bi-plus-circle me-2"></i>Crear</button>
+</div>
 <table class="table">
     <thead>
         <tr>
         <th scope="col">#</th>
         <th scope="col">Descripcion</th>
         <th scope="col">Precio</th>
+        <th scope="col text-center">Acciones</th>
         </tr>
     </thead>
     <tbody class="table-group-divider">
@@ -16,6 +20,12 @@
                 <th scope="row">@producto.idProducto</th>
                 <td>@producto.descripcion</td>
                 <td>$ @producto.precio</td>
+                <td>
+                    <div class="d-flex justify-content-evenly">
+                        <button type="button" class="btn btn-primary"><i class="bi bi-pencil-square"></i></button>
+                        <button type="button" class="btn btn-danger"><i class="bi bi-trash"></i></button>
+                    </div>
+                </td>
             </tr>
         }
     </tbody>
