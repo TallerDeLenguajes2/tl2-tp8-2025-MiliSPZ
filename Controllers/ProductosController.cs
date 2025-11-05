@@ -18,4 +18,17 @@ public class ProductosController: Controller
         return View(productos);
     }
 
+    [HttpGet]
+    public IActionResult Create()
+    {
+        var producto = new Productos();
+        return View(producto);
+    }
+
+    [HttpPost]
+    public IActionResult Create(Productos productoNuevo)
+    {
+        productoRepository.createProducto(productoNuevo);
+        return RedirectToAction("Index");
+    }
 }
