@@ -31,4 +31,19 @@ public class ProductosController: Controller
         productoRepository.createProducto(productoNuevo);
         return RedirectToAction("Index");
     }
+
+    [HttpGet]
+    public IActionResult Edit(int id)
+    {
+        var producto = productoRepository.getDetallesProducto(id);
+        if (producto is null) RedirectToAction("Index");
+        return View(producto);
+    }
+
+    [HttpPost]
+    public IActionResult Edit(Productos producto)
+    {
+        productoRepository.updateProducto(producto);
+        return RedirectToAction("Index");
+    }
 }
