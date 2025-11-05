@@ -46,4 +46,11 @@ public class ProductosController: Controller
         productoRepository.updateProducto(producto);
         return RedirectToAction("Index");
     }
+
+    [HttpGet]
+    public IActionResult Delete(int id)
+    {
+        productoRepository.deleteProducto(id);
+        return RedirectToAction("Index");
+    }
 }
