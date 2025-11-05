@@ -34,14 +34,14 @@ public class ProductosRepository
 
     }
 
-    public bool updateProducto(int id, Productos producto)
+    public bool updateProducto(Productos producto)
     {
         try
         {
             using (var connection = new SqliteConnection(connectionString))
             {
                 connection.Open();
-                string sql = "UPDATE Productos SET Descripcion = @desc, Precio = @prec WHERE idProdcuto = @id";
+                string sql = "UPDATE Productos SET Descripcion = @desc, Precio = @prec WHERE idProducto= @id";
 
                 using (var command = new SqliteCommand(sql, connection))
                 {
