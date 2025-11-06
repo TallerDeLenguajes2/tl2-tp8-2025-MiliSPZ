@@ -28,6 +28,10 @@ public class ProductosController: Controller
     [HttpPost]
     public IActionResult Create(Productos productoNuevo)
     {
+        if (!ModelState.IsValid)
+        {
+            return View("Create"); 
+        }
         productoRepository.createProducto(productoNuevo);
         return RedirectToAction("Index");
     }
