@@ -63,140 +63,89 @@ public class PresupuestosRepository
         return ListaPresupuestos;
     }
 
-    // Obtener detalles de un Presupuesto por su ID. (recibe un Id y devuelve u Presupuesto con sus productos y cantidades)
-
-    public Presupuestos getDetallesPresupuesto(int id)
+    public List<PresupuestosDetalle> getDetallesPresupuesto(int id)
     {
-        using (var connection = new SqliteConnection(connectionString))
+        var listaDetalles = new List<PresupuestosDetalle>();
+        using (var conexion = new SqliteConnection(connectionString))
         {
-            connection.Open();
-            string sql = "SELECT p.idPresupuesto, p.NombreDestinatario, p.FechaCreacion, pr.idProducto, pr.Descripcion, pr.Precio, pd.Cantidad FROM Presupuestos AS p INNER JOIN PresupuestosDetalle AS pd ON pd.idPresupuesto = p.idPresupuesto INNER JOIN Productos AS pr ON pr.idProducto = pd.idProducto WHERE p.idPresupuesto = @id;";
-            using (var command = new SqliteCommand(sql, connection))
+            conexion.Open();
+            string consulta = "SELECT * FROM Presupuestos INNER JOIN PresupuestosDetalle using(IdPresupuesto) INNER JOIN Productos using(IdProducto) WHERE IdPresupuesto = @Id";
+
+            var comando = new SqliteCommand(consulta, conexion);
+            comando.Parameters.Add(new SqliteParameter("@Id", id));
+
+            using var lector = comando.ExecuteReader();
+
+            while (lector.Read())
             {
-                command.Parameters.AddWithValue("@id", id);
+                var producto = new Productos(Convert.ToInt32(lector["IdProducto"]), lector["Descripcion"].ToString(), Convert.ToInt32(lector["Precio"]));
 
-                using (var reader = command.ExecuteReader())
-                {
-                    var presupuestoEncontrado = new Presupuestos();
-                    while (reader.Read())
-                    {
-                        presupuestoEncontrado.idPresupuesto = Convert.ToInt32(reader["idProducto"]);
-                        presupuestoEncontrado.nombreDestinatario = reader["NombreDestinatario"].ToString();
+                var detalle = new PresupuestosDetalle(producto, Convert.ToInt32(lector["Cantidad"]));
 
-                        var iFecha = reader.GetOrdinal("FechaCreacion");
-                        presupuestoEncontrado.fechaCreacion = DateOnly.FromDateTime(reader.GetDateTime(iFecha));
-
-                        presupuestoEncontrado.detalle = new List<PresupuestosDetalle>();
-
-                        var prod = new Productos
-                        {
-                            idProducto = reader.GetInt32(reader.GetOrdinal("idProducto")),
-                            descripcion = reader["ProductoDescripcion"]?.ToString(),
-                            // Sugerencia: precio debería ser decimal; si por ahora es int, convertimos tal cual
-                            precio = Convert.ToInt32(reader["ProductoPrecio"])
-                        };
-
-                        presupuestoEncontrado.detalle.Add(new PresupuestosDetalle
-                        {
-                            producto = prod,
-                            cantidad = reader.GetInt32(reader.GetOrdinal("Cantidad"))
-                        });
-                    }
-
-                    return presupuestoEncontrado;
-                }
-
+                listaDetalles.Add(detalle);
             }
 
         }
-    }
-    
-    public bool AgregarProductoAPresupuesto(int idPresupuesto, int idProducto, int cantidad)
-    {
-        if (cantidad <= 0) throw new ArgumentOutOfRangeException(nameof(cantidad), "La cantidad debe ser > 0.");
+        return listaDetalles;
 
-        using var connection = new SqliteConnection(connectionString);
-        connection.Open();
-        using var tx = connection.BeginTransaction();
-
-        // (Opcional) validar que exista el presupuesto
-        using (var chk = new SqliteCommand("SELECT 1 FROM Presupuestos WHERE idPresupuesto=@id LIMIT 1", connection, tx))
-        {
-            chk.Parameters.AddWithValue("@id", idPresupuesto);
-            var exists = chk.ExecuteScalar();
-            if (exists is null)
-                throw new InvalidOperationException($"No existe el presupuesto {idPresupuesto}.");
-        }
-
-        // ¿Ya existe ese producto en el detalle? -> UPDATE, si no -> INSERT
-        int? cantidadActual = null;
-        using (var sel = new SqliteCommand(
-            "SELECT Cantidad FROM PresupuestosDetalle WHERE idPresupuesto=@idP AND idProducto=@idPr LIMIT 1",
-            connection, tx))
-        {
-            sel.Parameters.AddWithValue("@idP", idPresupuesto);
-            sel.Parameters.AddWithValue("@idPr", idProducto);
-            var r = sel.ExecuteScalar();
-            if (r != null && r != DBNull.Value) cantidadActual = Convert.ToInt32(r);
-        }
-
-        if (cantidadActual.HasValue)
-        {
-            using var upd = new SqliteCommand(
-                "UPDATE PresupuestosDetalle SET Cantidad = Cantidad + @cant WHERE idPresupuesto=@idP AND idProducto=@idPr",
-                connection, tx);
-            upd.Parameters.AddWithValue("@cant", cantidad);
-            upd.Parameters.AddWithValue("@idP", idPresupuesto);
-            upd.Parameters.AddWithValue("@idPr", idProducto);
-            upd.ExecuteNonQuery();
-        }
-        else
-        {
-            using var ins = new SqliteCommand(
-                "INSERT INTO PresupuestosDetalle (idPresupuesto, idProducto, Cantidad) VALUES (@idP, @idPr, @cant)",
-                connection, tx);
-            ins.Parameters.AddWithValue("@idP", idPresupuesto);
-            ins.Parameters.AddWithValue("@idPr", idProducto);
-            ins.Parameters.AddWithValue("@cant", cantidad);
-            ins.ExecuteNonQuery();
-        }
-
-        tx.Commit();
-        return true;
     }
 
-    // 2) Eliminar un presupuesto por ID (borra primero el detalle para evitar FK issues)
-    public bool EliminarPresupuestoPorId(int idPresupuesto)
+    public bool agregarDetalle(int idPresupuesto, int idProducto, int cantidad)
     {
-        using var connection = new SqliteConnection(connectionString);
-        connection.Open();
-        using var tx = connection.BeginTransaction();
-
-        // Si tenés FK con ON DELETE CASCADE podrías omitir este DELETE
-        using (var delDet = new SqliteCommand(
-            "DELETE FROM PresupuestosDetalle WHERE idPresupuesto=@id",
-            connection, tx))
+        using (var conexion = new SqliteConnection(connectionString))
         {
-            delDet.Parameters.AddWithValue("@id", idPresupuesto);
-            delDet.ExecuteNonQuery();
-        }
+            conexion.Open();
+            string sql = "INSERT INTO PresupuestosDetalle (IdPresupuesto, IdProducto, Cantidad) VALUES (@IdPre, @IdPro, @Cant)";
 
-        int borrados;
-        using (var del = new SqliteCommand(
-            "DELETE FROM Presupuestos WHERE idPresupuesto=@id",
-            connection, tx))
+            var command = new SqliteCommand(sql, conexion);
+
+            command.Parameters.Add(new SqliteParameter("@IdPre", idPresupuesto));
+            command.Parameters.Add(new SqliteParameter("@IdPro", idProducto));
+            command.Parameters.Add(new SqliteParameter("@Cant", cantidad));
+
+            int filas = command.ExecuteNonQuery();
+            if (filas > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+    public bool deletePresupuesto(int id)
+    {
+        int rows = 0;
+        try
         {
-            del.Parameters.AddWithValue("@id", idPresupuesto);
-            borrados = del.ExecuteNonQuery();
-        }
+            using (var connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+                string sql1 = "DELETE FROM PresupuestosDetalle WHERE idPresupuesto = @id";
+                using (var command = new SqliteCommand(sql1, connection))
+                {
+                    command.Parameters.AddWithValue("@id", id);
 
-        if (borrados == 0)
+                    command.ExecuteNonQuery();
+                }
+
+                string sql2 = "DELETE FROM Presupuestos WHERE idPresupuesto = @id";
+
+                using (var command = new SqliteCommand(sql2, connection))
+                {
+                    command.Parameters.AddWithValue("@id", id);
+
+                    rows = command.ExecuteNonQuery();
+                    return rows > 0;
+                }
+            }
+        }
+        catch
         {
-            tx.Rollback();
-            return false; // no existía el presupuesto
-        }
 
-        tx.Commit();
-        return true;
+            return false;
+        }
     }
 }
