@@ -40,7 +40,7 @@ public class ProductosController: Controller
     public IActionResult Edit(int id)
     {
         var producto = productoRepository.getDetallesProducto(id);
-        if (producto is null) RedirectToAction("Index");
+        if (producto is null) return RedirectToAction("Index");
         return View(producto);
     }
 
@@ -54,7 +54,15 @@ public class ProductosController: Controller
     [HttpGet]
     public IActionResult Delete(int id)
     {
-        productoRepository.deleteProducto(id);
+        var producto = productoRepository.getDetallesProducto(id);
+        if (producto is null) return RedirectToAction("Index");
+        return View(producto);
+    }
+
+    [HttpPost]
+    public IActionResult Delete(Productos producto)
+    {
+        productoRepository.deleteProducto(producto.idProducto);
         return RedirectToAction("Index");
     }
 }
