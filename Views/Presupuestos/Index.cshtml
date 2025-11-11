@@ -1,0 +1,40 @@
+@using Sistema
+@model List<Presupuestos>
+
+<div class="p-2">
+    <h1>Presupuestos</h1>
+    <span>Lista de los Presupuestos</span>
+    <div class="d-flex justify-content-end">
+        <a asp-controller="Presupuestos" asp-action="Create" class="btn btn-warning"><i class="bi bi-plus me-2"></i>Crear Presupuesto</a>
+    </div>
+
+    <div class="table-responsive rounded-3 overflow-hidden border mt-3 shadow-sm">
+        <table class="table table-hover table-sm mb-0">
+            <thead>
+                <tr class="table-warning">
+                    <th scope="col">#</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Fecha de Creacion</th>
+                    <th scope="col" class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                @foreach (var presupuesto in Model)
+                {
+                    <tr>
+                        <th scope="row">@presupuesto.idPresupuesto</th>
+                        <td>@presupuesto.nombreDestinatario</td>
+                        <td>@presupuesto.fechaCreacion</td>
+                        <td>
+                            <div class="d-flex justify-content-center gap-3">
+                                <a asp-controller="Presupuestos" asp-action="Edit" asp-route-id="@presupuesto.idPresupuesto" class="btn btn-primary"><i class="bi bi-eye"></i></a>
+                                <a asp-controller="Presupuestos" asp-action="Edit" asp-route-id="@presupuesto.idPresupuesto" class="btn btn-warning"><i class="bi bi-pencil-square"></i></a>
+                                <a asp-controller="Presupuestos" asp-action="Delete" asp-route-id="@presupuesto.idPresupuesto" class="btn btn-danger"><i class="bi bi-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
