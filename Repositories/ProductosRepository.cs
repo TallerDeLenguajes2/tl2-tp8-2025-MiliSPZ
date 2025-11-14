@@ -1,7 +1,8 @@
 using Microsoft.Data.Sqlite;
 using SQLitePCL;
 
-namespace Sistema;
+namespace Sistema.Web.Repository;
+using Sistema.Web.Models;
 
 public class ProductosRepository
 {

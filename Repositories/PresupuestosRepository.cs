@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Data.Sqlite;
-namespace Sistema;
+namespace Sistema.Web.Repository;
+using Sistema.Web.Models;
 
 public class PresupuestosRepository
 {

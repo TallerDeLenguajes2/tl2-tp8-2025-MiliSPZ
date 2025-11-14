@@ -1,4 +1,4 @@
-namespace Sistema;
+namespace Sistema.Web.Models;
 
 public class PresupuestosDetalle
 {
