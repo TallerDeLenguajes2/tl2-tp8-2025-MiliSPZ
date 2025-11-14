@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-namespace Sistema;
+using Sistema.Web.ViewModels;
+using Sistema.Web.Models;
+using Sistema.Web.Repository;
 
 public class ProductosController: Controller
 {
@@ -21,13 +23,24 @@ public class ProductosController: Controller
     [HttpGet]
     public IActionResult Create()
     {
-        var producto = new Productos();
+        var producto = new ProductoViewModel();
         return View(producto);
     }
 
     [HttpPost]
-    public IActionResult Create(Productos productoNuevo)
+    public IActionResult Create(ProductoViewModel productoVM)
     {
+        if (!ModelState.IsValid)
+        {
+            return View(productoVM);    
+        }
+
+        var productoNuevo = new Productos
+        {
+            descripcion = productoVM.Descripcion,
+            precio = productoVM.Precio
+        };
+
         productoRepository.createProducto(productoNuevo);
         return RedirectToAction("Index");
     }
@@ -36,13 +49,41 @@ public class ProductosController: Controller
     public IActionResult Edit(int id)
     {
         var producto = productoRepository.getDetallesProducto(id);
-        if (producto is null) RedirectToAction("Index");
-        return View(producto);
+
+        if (producto is null)
+        {
+            Console.WriteLine($"ID: {producto.idProducto}, Desc: {producto.descripcion}, Precio: {producto.precio}");
+
+            return RedirectToAction("Index");
+        }
+
+        var editProducto = new ProductoViewModel
+        {
+            idProducto = producto.idProducto,
+            Descripcion = producto.descripcion,
+            Precio = producto.precio
+        };
+
+        return View(editProducto);
     }
 
     [HttpPost]
-    public IActionResult Edit(Productos producto)
-    {
+    public IActionResult Edit( ProductoViewModel productoVM)
+    {   
+        Console.WriteLine($"ID: {productoVM.idProducto}, Desc: {productoVM.Descripcion}, Precio: {productoVM.Precio}");
+
+        if (!ModelState.IsValid)
+        {
+            return View(productoVM);
+        }
+
+        var producto = new Productos
+        {
+            idProducto = productoVM.idProducto,
+            descripcion = productoVM.Descripcion,
+            precio = productoVM.Precio
+        };
+
         productoRepository.updateProducto(producto);
         return RedirectToAction("Index");
     }
