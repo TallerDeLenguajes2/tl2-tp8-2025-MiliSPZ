@@ -146,8 +146,7 @@ public class PresupuestosRepository
             return presupuesto;
         }
     }
-
-
+    
     public bool agregarDetalle(int idPresupuesto, int idProducto, int cantidad)
     {
         using (var conexion = new SqliteConnection(connectionString))
