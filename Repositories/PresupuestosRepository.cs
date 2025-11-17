@@ -39,12 +39,12 @@ public class PresupuestosRepository
             using (var connection = new SqliteConnection(connectionString))
             {
                 connection.Open();
-                string sql = "UPDATE Presupuestos SET Descripcion = @desc, Precio = @prec WHERE idPresupuesto = @id";
+                string sql = "UPDATE Presupuestos SET NombreDestinatario = @nombre, FechaCreacion = @fecha WHERE idPresupuesto = @id";
 
                 using (var command = new SqliteCommand(sql, connection))
                 {
-                    command.Parameters.AddWithValue("@desc", Presupuesto.nombreDestinatario);
-                    command.Parameters.AddWithValue("@prec", Presupuesto.fechaCreacion);
+                    command.Parameters.AddWithValue("@nombre", Presupuesto.nombreDestinatario);
+                    command.Parameters.AddWithValue("@fecha", Presupuesto.fechaCreacion);
                     command.Parameters.AddWithValue("@id", Presupuesto.idPresupuesto);
 
                     int rows = command.ExecuteNonQuery();
