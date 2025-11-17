@@ -48,12 +48,12 @@ public class PresupuestosController: Controller
         return View(presupuesto);
     }
 
-   /*  [HttpPost]
+    [HttpPost]
     public IActionResult Edit(Presupuestos presupuesto)
     {
         presupuestoRepository.updatePresupuesto(presupuesto);
         return RedirectToAction("Index");
-    } */
+    } 
 
     [HttpGet]
     public IActionResult Delete(int id)
