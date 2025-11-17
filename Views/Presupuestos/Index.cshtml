@@ -2,13 +2,14 @@
 @model List<Presupuestos>
 
 <div class="p-2">
-    <h1>Presupuestos</h1>
-    <span>Lista de los Presupuestos</span>
+    <h1 class="fw-bolder">Presupuestos</h1>
+    <span class="text-secondary fw-semibold">Lista de los Presupuestos</span>
+
     <div class="d-flex justify-content-end">
         <a asp-controller="Presupuestos" asp-action="Create" class="btn btn-warning"><i class="bi bi-plus me-2"></i>Crear Presupuesto</a>
     </div>
 
-    <div class="table-responsive rounded-3 overflow-hidden border mt-5 shadow-sm">
+    <div class="table-responsive rounded-4 overflow-hidden border mt-5 shadow-sm">
         <table class="table table-hover align-middle mb-0 table-spacious">
             <thead>
                 <tr>
