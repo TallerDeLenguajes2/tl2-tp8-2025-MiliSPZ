@@ -21,7 +21,11 @@ public class PresupuestosController: Controller
     [HttpGet]
     public IActionResult Create()
     {
-        var presupuesto = new Presupuestos();
+        var presupuesto = new Presupuestos
+        {
+            fechaCreacion = DateOnly.FromDateTime(DateTime.Today)
+        };
+        
         return View(presupuesto);
     }
 
