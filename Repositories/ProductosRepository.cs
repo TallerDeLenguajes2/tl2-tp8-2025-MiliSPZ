@@ -42,7 +42,7 @@ public class ProductosRepository
             using (var connection = new SqliteConnection(connectionString))
             {
                 connection.Open();
-                string sql = "UPDATE Productos SET Descripcion = @desc, Precio = @prec WHERE idProducto= @id";
+                string sql = "UPDATE Productos SET Descripcion = @desc, Precio = @prec WHERE idProducto = @id";
 
                 using (var command = new SqliteCommand(sql, connection))
                 {

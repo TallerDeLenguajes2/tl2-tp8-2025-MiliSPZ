@@ -1,0 +1,12 @@
+@using Sistema
+@model Presupuestos
+
+<form asp-action="Delete" method="post" asp-route-id="@Model.idPresupuesto" class="form-horizontal d-flex flex-column justify-items-center align-items-center">
+    <h1><i class="bi bi-exclamation-circle text-danger"></i></h1>
+    <h4>¿Desea eliminar el presupuesto de "<strong>@Model.nombreDestinatario</strong>" permanentemente?</h4>
+    <input type="hidden" asp-for="idPresupuesto"/>
+    <div class="form-group mt-2">
+        <button type="submit" class="btn btn-danger">Si, eliminar</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </div>
+</form>

@@ -1,0 +1,41 @@
+@using Sistema
+@model List<Presupuestos>
+
+<div class="p-2">
+    <h1 class="fw-bolder">Presupuestos</h1>
+    <span class="text-secondary fw-semibold">Lista de los Presupuestos</span>
+
+    <div class="d-flex justify-content-end">
+        <a asp-controller="Presupuestos" asp-action="Create" class="btn btn-warning"><i class="bi bi-plus me-2"></i>Crear Presupuesto</a>
+    </div>
+
+    <div class="table-responsive rounded-4 overflow-hidden border mt-5 shadow-sm">
+        <table class="table table-hover align-middle mb-0 table-spacious">
+            <thead>
+                <tr>
+                    <th scope="col" class="text-secondary py-3 px-4">#</th>
+                    <th scope="col" class="text-secondary py-3 px-4">Nombre</th>
+                    <th scope="col" class="text-secondary py-3 px-4">Fecha de Creacion</th>
+                    <th scope="col" class="text-end text-secondary py-3 px-4">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var presupuesto in Model)
+                {
+                    <tr>
+                        <td scope="row" class="py-3 px-4">@presupuesto.idPresupuesto</td>
+                        <td class="py-3 px-4">@presupuesto.nombreDestinatario</td>
+                        <td class="py-3 px-4">@presupuesto.fechaCreacion</td>
+                        <td class="py-3 px-4">
+                            <div class="d-flex justify-content-end gap-3">
+                                <a asp-controller="Presupuestos" asp-action="Edit" asp-route-id="@presupuesto.idPresupuesto" class="btn btn-outline-warning"><i class="bi bi-eye"></i></a>
+                                <a asp-controller="Presupuestos" asp-action="Edit" asp-route-id="@presupuesto.idPresupuesto" class="btn btn-outline-secondary"><i class="bi bi-pencil-square"></i></a>
+                                <a asp-controller="Presupuestos" asp-action="Delete" asp-route-id="@presupuesto.idPresupuesto" class="btn btn-danger"><i class="bi bi-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
