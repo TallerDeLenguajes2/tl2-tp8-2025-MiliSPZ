@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering; 
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace Sistema.Web.ViewModels;
 
@@ -7,13 +8,14 @@ public class AgregarProductoViewModel
 {
     public int idPresupuesto { get; set; }
 
-    [Display(Name = "Producto a agregar")]
+    [Display(Name = "Producto")]
+    [Range(1, int.MaxValue, ErrorMessage = "Seleccione un producto.")]
     public int IdProducto { get; set; }
 
-    [Display(Name = "Cantidad")]
-    [Required(ErrorMessage = "La cantidad es obligatoria.")]
-    [Range(1, int.MaxValue, ErrorMessage = "La cantidad debe ser mayor a cero.")]
+    [Range(1, int.MaxValue, ErrorMessage = "La cantidad debe ser mayor a 0.")]
     public int Cantidad { get; set; }
 
-    public SelectList ListaProductos { get; set; }
+    /* preguntar porque me pide validacion */
+    [ValidateNever]
+    public IEnumerable<SelectListItem> ListaProductos { get; set; }
 }

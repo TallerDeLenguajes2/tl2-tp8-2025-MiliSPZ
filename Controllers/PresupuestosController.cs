@@ -16,16 +16,11 @@ public class PresupuestosController: Controller
     [HttpGet]
     public IActionResult AgregarProducto(int id)
     {
-        // 1. Obtener los productos para el SelectList
-        List<Productos> productos = productoRepository.getProductos();
-
-        // 2. Crear el ViewModel
-        AgregarProductoViewModel model = new AgregarProductoViewModel
+        var productos = productoRepository.getProductos();
+        var model = new AgregarProductoViewModel
         {
-            idPresupuesto = id, // Pasamos el ID del presupuesto actual
-
-            // 3. Crear el SelectList
-            ListaProductos = new SelectList(productos, "IdProducto", "Descripcion")
+            idPresupuesto = id,
+            ListaProductos = new SelectList(productos, "idProducto", "descripcion")
         };
         return View(model);
     }
@@ -33,23 +28,24 @@ public class PresupuestosController: Controller
     [HttpPost]
     public IActionResult AgregarProducto(AgregarProductoViewModel model)
     {
-       // 1. Chequeo de Seguridad para la Cantidad
         if (!ModelState.IsValid)
         {
-        // LÓGICA CRÍTICA DE RECARGA: Si falla la validación,
-        // debemos recargar el SelectList porque se pierde en el POST.
-        var productos = productoRepository.getProductos();
-        model.ListaProductos = new SelectList(productos, "IdProducto", "Descripcion");
+            var productos = productoRepository.getProductos();
+            model.ListaProductos = new SelectList(productos, "idProducto", "descripcion");
 
-        // Devolvemos el modelo con los errores y el dropdown recargado
-        return View(model);
+            // Guardar errores para mostrarlos en la vista (temporal)
+            TempData["ModelErrors"] = string.Join(" | ", ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage));
+
+            return View(model);
         }
 
-        // 2. Si es VÁLIDO: Llamamos al repositorio para guardar la relación
-        presupuestoRepository.agregarDetalle(model.idPresupuesto, model.IdProducto, model.Cantidad);
+        // Debug: inspeccionar valores recibidos en Output (quitar luego)
+        System.Diagnostics.Debug.WriteLine($"AgregarProducto POST: idPresupuesto={model.idPresupuesto}, IdProducto={model.IdProducto}, Cantidad={model.Cantidad}");
 
-        // 3. Redirigimos al detalle del presupuesto
-        return RedirectToAction(nameof(Details), new { id = model.idPresupuesto }); 
+        presupuestoRepository.agregarDetalle(model.idPresupuesto, model.IdProducto, model.Cantidad);
+        return RedirectToAction(nameof(Details), new { id = model.idPresupuesto });
     }
 
     [HttpGet]
@@ -64,6 +60,15 @@ public class PresupuestosController: Controller
     {
         var presupuesto = presupuestoRepository.getDetallesPresupuesto(id);
         if (presupuesto is null) return RedirectToAction("Index");
+
+        var ar = new System.Globalization.CultureInfo("es-AR");
+        ViewBag.FechaLarga = presupuesto.fechaCreacion
+            .ToDateTime(System.TimeOnly.MinValue)
+            .ToString("d 'de' MMMM 'de' yyyy", ar);
+
+        var total = presupuesto.MontoPresupuestos();
+        ViewBag.TotalFmt = string.Format(ar, "{0:C0}", total);
+
         return View(presupuesto);
     }
 

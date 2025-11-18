@@ -4,17 +4,24 @@
  ViewData["Title"] = "Agregar Producto al Presupuesto";
 }
 
+<div class="d-flex gap-2 my-3">
+    <a a asp-action="Details" asp-route-id="@Model.idPresupuesto" class="btn btn-outline-dark d-flex gap-2 border border-0"><i class="bi bi-arrow-left"></i>volver</a>
+</div>
 <h2>Agregar Producto al Presupuesto Nro @Model.idPresupuesto</h2>
 <hr/>
 <div class="row">
     <div class="col-md-6">
-        <form asp-action="AgregarProducto">
+        <form asp-action="AgregarProducto" method="post">
+            @if (TempData["ModelErrors"] != null)
+            {
+                <div class="alert alert-danger">@TempData["ModelErrors"]</div>
+            }
 
-            <input type="hidden" asp-for="idPresupuesto" />
+            <input type="hidden" asp-for="idPresupuesto"/>
             <div class="form-group">
                 <label asp-for="IdProducto" class="control-label"></label>
-                <select asp-for="IdProducto" asp-items="@Model.ListaProductos" class="form-control">
-                    <option value="">-- Seleccionar Producto --</option>
+                <select asp-for="IdProducto" asp-items="Model.ListaProductos ?? new SelectList(Enumerable.Empty<SelectListItem>())" class="form-control">
+                    <option value="0"> Seleccionar Producto...</option>
                 </select>
                 <span asp-validation-for="IdProducto" class="text-danger"></span>
             </div>
@@ -29,10 +36,6 @@
             </div>
         </form>
     </div>
-</div>
-
-<div class="mt-3">
-    <a asp-action="Details" asp-route-id="@Model.idPresupuesto">Volver al Presupuesto</a>
 </div>
 
 @section Scripts {
