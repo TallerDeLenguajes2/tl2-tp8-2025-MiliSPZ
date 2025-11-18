@@ -33,16 +33,8 @@ public class PresupuestosController: Controller
             var productos = productoRepository.getProductos();
             model.ListaProductos = new SelectList(productos, "idProducto", "descripcion");
 
-            // Guardar errores para mostrarlos en la vista (temporal)
-            TempData["ModelErrors"] = string.Join(" | ", ModelState.Values
-                .SelectMany(v => v.Errors)
-                .Select(e => e.ErrorMessage));
-
             return View(model);
         }
-
-        // Debug: inspeccionar valores recibidos en Output (quitar luego)
-        System.Diagnostics.Debug.WriteLine($"AgregarProducto POST: idPresupuesto={model.idPresupuesto}, IdProducto={model.IdProducto}, Cantidad={model.Cantidad}");
 
         presupuestoRepository.agregarDetalle(model.idPresupuesto, model.IdProducto, model.Cantidad);
         return RedirectToAction(nameof(Details), new { id = model.idPresupuesto });
