@@ -1,78 +1,91 @@
 @using Sistema.Web.Models
 @model Presupuestos
+@using System.Globalization
+@{
+    var fechaLarga = ViewBag.FechaLarga as string;
+    var totalFmt = ViewBag.TotalFmt as string;
+    var ar = new CultureInfo("es-AR");
+}
 
 <div class="p-2">
+    <div class="d-flex gap-2 my-3">
+        <a asp-controller="Presupuestos" asp-action="Index" class="btn btn-outline-dark d-flex gap-2 border border-0"><i class="bi bi-arrow-left"></i>volver</a>
+    </div>
     <h1 class="fw-bolder">Presupuestos #@Model.idPresupuesto</h1>
-        <span class="text-secondary fw-semibold">Detalles del presupuesto y productos relacionados</span>
+    <span class="text-secondary fw-semibold">Detalles del presupuesto y productos relacionados</span>
 
-    <div class="text-center">
-        <h1 class="display-4">Detalle!!</h1>
+    <div class="row row-cols-1 row-cols-md-3 g-4 my-5">
+        <div class="col mt-0">
+            <div class="card border rounded-3 h-100 p-2">
+            <div class="card-body">
+                <div class="text-muted small mb-1">Cliente</div>
+                <div class="h4 fw-bold mb-0">@Model.nombreDestinatario</div>
+            </div>
+            </div>
+        </div>
 
-        @if (Model?.detalle == null || Model.detalle.Count == 0)
-        {
-            <div class="alert alert-info">No hay productos en este presupuesto.</div>
-        }
-        else
-        {
-            <table class="table">
+        <div class="col mt-0">
+            <div class="card border rounded-3 h-100 p-2">
+            <div class="card-body">
+                <div class="text-muted small mb-1">Fecha</div>
+                <div class="h4 fw-bold mb-0">@fechaLarga</div>
+            </div>
+            </div>
+        </div>
+
+        <div class="col mt-0">
+            <div class="card border rounded-3 h-100 p-2">
+            <div class="card-body">
+                <div class="text-muted small mb-1">Total</div>
+                <div class="h4 fw-bold mb-0 text-primary">@totalFmt</div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between">
+    <h4 class="fw-bold">Productos Relacionados</h4>
+        <div class="d-flex justify-content-end">
+            <a asp-controller="Presupuestos" asp-action="AgregarProducto" asp-route-id="@Model.idPresupuesto" class="btn btn-primary"><i class="bi bi-plus me-2"></i>Agregar producto</a>   
+        </div>
+    </div>
+    
+    @if (Model?.detalle == null || Model.detalle.Count == 0)
+    {
+        <div class="col mt-2">
+            <div class="card border rounded-3 h-100 p-2">
+            <div class="card-body p-4 d-flex flex-column gap-2 justify-content-center align-items-center">
+                <div><i class="bi bi-box-seam text-secondary h1"></i></div>
+                <div class="h5 fw-bold mb-0">Sin productos relacionados</div>
+                <div class="text-muted small mb-1">Este presupuesto no tiene productos asociado</div>
+            </div>
+            </div>
+        </div>
+    }
+    else
+    {   
+        <div class="table-responsive rounded-4 overflow-hidden border shadow-sm mt-3">
+            <table class="table table-hover align-middle mb-0 table-spacious">
                 <thead>
-                    LISTA DE PRODUCTOS DEL PRESUPUESTO
+                    <th scope="col" class="text-secondary py-3 px-4">#</th>
+                    <th scope="col" class="text-secondary py-3 px-4">Producto</th>
+                    <th scope="col" class="text-secondary py-3 px-4">Precio</th>
+                    <th scope="col" class="text-secondary py-3 px-4">Cantidad</th>
                 </thead>
                 <tbody>
-                    <th>Producto</th>
-                    <th>Cantidad</th>
-                    @foreach (var detalle in Model.detalle)
+                    
+                    @foreach (PresupuestosDetalle detalle in Model.detalle)
                     {
                         <tr>
-                            <td>
-                                @detalle.producto?.descripcion
+                            <td scope="row" class="py-3 px-4">@detalle.producto.idProducto</td>
+                            <td class="py-3 px-4">@detalle.producto?.descripcion</td>
+                            <td class="py-3 px-4 text-primary fw-bold">
+                                @detalle.producto.precio.ToString("C0", ar)
                             </td>
-                            <td>
-                                @detalle.cantidad
-                            </td>
+                            <td class="py-3 px-4">@detalle.cantidad</td>
                         </tr>
                     }
                 </tbody>
             </table>
-        }
-        <div class="d-flex justify-content-center">
-            <a class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#modalAgregarDetalle">Agregar detalle</a>
         </div>
-
-        <div class="d-flex justify-content-left">
-            <a asp-controller="Presupuesto" asp-action="Index" class="btn btn-dark m-5">volver</a>
-        </div>
-
-        <div class="modal fade" id="modalAgregarDetalle">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Agregar Detalle</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-
-                    <div class="modal-body">
-                        <form asp-controller="Presupuesto" asp-action="AgregarDetalle" method="post">
-
-                            <div class="mb-3">
-                                <label>Producto</label>
-                                <select name="Producto">
-                                    <option value="">
-                                        Seleccionar producto...</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label>Precio</label>
-                                <input class="form-control" type="number" name="Precio" required />
-                            </div>
-
-                            <button type="submit" class="btn btn-success">Guardar</button>
-
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+    }
