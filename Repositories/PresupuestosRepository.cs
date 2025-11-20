@@ -1,10 +1,11 @@
-using System;
-using System.Collections.Generic;
-using Microsoft.Data.Sqlite;
 namespace Sistema.Web.Repository;
-using Sistema.Web.Models;
 
-public class PresupuestosRepository
+using Sistema.Web.Models;
+using Sistema.Web.Interfaces;
+
+using Microsoft.Data.Sqlite;
+
+public class PresupuestosRepository : IPresupuestoRepository
 {
     string connectionString = "Data Source=Tienda.db";
 
