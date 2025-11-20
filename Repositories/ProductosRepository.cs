@@ -1,10 +1,11 @@
-using Microsoft.Data.Sqlite;
-using SQLitePCL;
-
 namespace Sistema.Web.Repository;
-using Sistema.Web.Models;
 
-public class ProductosRepository
+using Sistema.Web.Models;
+using Sistema.Web.Interfaces;
+
+using Microsoft.Data.Sqlite;
+
+public class ProductosRepository : IProductoRepository
 {
     string connectionString = "Data Source=Tienda.db";
 
