@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Sistema.Web.ViewModels;
 using Sistema.Web.Models;
-using Sistema.Web.Repository;
+using Sistema.Web.Repositories;
 
 public class ProductosController: Controller
 {

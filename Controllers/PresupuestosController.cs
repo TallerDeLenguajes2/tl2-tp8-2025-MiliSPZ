@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Sistema.Web.Repository;
+using Sistema.Web.Repositories;
 using Sistema.Web.ViewModels;
 using Sistema.Web.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
