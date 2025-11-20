@@ -2,20 +2,43 @@ using Microsoft.AspNetCore.Mvc;
 using Sistema.Web.Repositories;
 using Sistema.Web.ViewModels;
 using Sistema.Web.Models;
+using Sistema.Web.Interfaces;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 
 public class PresupuestosController: Controller
 {
-    private readonly PresupuestosRepository presupuestoRepository = new PresupuestosRepository();
+    private readonly IPresupuestoRepository presupuestoRepository;
 
-    private readonly ProductosRepository productoRepository = new ProductosRepository();
+    private readonly IProductoRepository productoRepository;
+    private IAuthenticationService _authService;
+
+    public PresupuestosController(IPresupuestoRepository repo, IProductoRepository prodRepo, IAuthenticationService authService)
+    {
+        presupuestoRepository = repo;
+        productoRepository = prodRepo;
+        _authService = authService;
+    }
 
     //A partir de aquí van todos los Action Methods (Get, Post,etc.)
-    
+    public IActionResult AccesoDenegado()
+    {
+        return View();
+    }
+
     [HttpGet]
     public IActionResult AgregarProducto(int id)
     {
+        if (!_authService.IsAuthenticated())
+        {
+            return RedirectToAction("Index", "Login");
+        }
+
+        if (!_authService.HasAccessLevel("Administrador"))
+        {
+            return RedirectToAction(nameof(AccesoDenegado));
+        }
+
         var productos = productoRepository.getProductos();
         var model = new AgregarProductoViewModel
         {
@@ -43,33 +66,70 @@ public class PresupuestosController: Controller
     [HttpGet]
     public IActionResult Index()
     {
-        List<Presupuestos> Presupuestos = presupuestoRepository.getPresupuestos();
-        return View(Presupuestos);
+        if (!_authService.IsAuthenticated())
+        {
+            return RedirectToAction("Index", "Login");
+        }
+
+        if (_authService.HasAccessLevel("Administrador") || _authService.HasAccessLevel("Cliente") )
+        {
+            //si es es valido entra sino vuelve a login
+            List<Presupuestos> Presupuestos = presupuestoRepository.getPresupuestos();
+            return View(Presupuestos);
+        }
+        else
+        {
+            return RedirectToAction("Index", "Login");
+        }
     }
 
     [HttpGet]
     public IActionResult Details(int id)
     {
-        var presupuesto = presupuestoRepository.getDetallesPresupuesto(id);
-        if (presupuesto is null) return RedirectToAction("Index");
+        if (!_authService.IsAuthenticated())
+        {
+            return RedirectToAction("Index", "Login");
+        }
 
-        var ar = new System.Globalization.CultureInfo("es-AR");
-        ViewBag.FechaLarga = presupuesto.fechaCreacion
-            .ToDateTime(System.TimeOnly.MinValue)
-            .ToString("d 'de' MMMM 'de' yyyy", ar);
+        if (_authService.HasAccessLevel("Administrador") || _authService.HasAccessLevel("Cliente") )
+        {
+            //si es es valido entra sino vuelve a login
+            var presupuesto = presupuestoRepository.getDetallesPresupuesto(id);
+            if (presupuesto is null) return RedirectToAction("Index");
 
-        var total = presupuesto.MontoPresupuestos();
-        ViewBag.TotalFmt = string.Format(ar, "{0:C0}", total);
+            var ar = new System.Globalization.CultureInfo("es-AR");
+            ViewBag.FechaLarga = presupuesto.fechaCreacion
+                .ToDateTime(System.TimeOnly.MinValue)
+                .ToString("d 'de' MMMM 'de' yyyy", ar);
 
-        return View(presupuesto);
+            var total = presupuesto.MontoPresupuestos();
+            ViewBag.TotalFmt = string.Format(ar, "{0:C0}", total);
+
+            return View(presupuesto);
+        }
+        else
+        {
+            return RedirectToAction("Index", "Login");
+        }
+  
     }
 
     [HttpGet]
     public IActionResult Create()
     {
-        var presupuesto = new Presupuestos
+        if (!_authService.IsAuthenticated())
         {
-            fechaCreacion = DateOnly.FromDateTime(DateTime.Today)
+            return RedirectToAction("Index", "Login");
+        }
+
+        if (!_authService.HasAccessLevel("Administrador"))
+        {
+            return RedirectToAction(nameof(AccesoDenegado));
+        }
+
+        var presupuesto = new PresupuestoViewModel
+        {
+            FechaCreacion = DateOnly.FromDateTime(DateTime.Today)
         };
         
         return View(presupuesto);
@@ -89,6 +149,16 @@ public class PresupuestosController: Controller
     [HttpGet]
     public IActionResult Edit(int id)
     {
+        if (!_authService.IsAuthenticated())
+        {
+            return RedirectToAction("Index", "Login");
+        }
+
+        if (!_authService.HasAccessLevel("Administrador"))
+        {
+            return RedirectToAction(nameof(AccesoDenegado));
+        }
+
         var presupuesto = presupuestoRepository.getDetallesPresupuesto(id);
         if (presupuesto is null) return RedirectToAction("Index");
         return View(presupuesto);
@@ -104,6 +174,16 @@ public class PresupuestosController: Controller
     [HttpGet]
     public IActionResult Delete(int id)
     {
+        if (!_authService.IsAuthenticated())
+        {
+            return RedirectToAction("Index", "Login");
+        }
+
+        if (!_authService.HasAccessLevel("Administrador"))
+        {
+            return RedirectToAction(nameof(AccesoDenegado));
+        }
+        
         var presupuesto = presupuestoRepository.getDetallesPresupuesto(id);
         if (presupuesto is null) return RedirectToAction("Index");
         return View(presupuesto);

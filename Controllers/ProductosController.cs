@@ -2,20 +2,30 @@ using Microsoft.AspNetCore.Mvc;
 using Sistema.Web.ViewModels;
 using Sistema.Web.Models;
 using Sistema.Web.Repositories;
+using Sistema.Web.Interfaces;
 
 public class ProductosController: Controller
 {
-    private ProductosRepository productoRepository;
-    public ProductosController()
+    private IProductoRepository productoRepository;
+    private IAuthenticationService _authService;
+    public ProductosController(IProductoRepository prodRepo, IAuthenticationService authService)
     {
-        productoRepository = new ProductosRepository();
+        productoRepository = prodRepo;
+        _authService = authService;
     }
 
     //A partir de aquí van todos los Action Methods (Get, Post,etc.)
+    public IActionResult AccesoDenegado()
+    {
+        return View();
+    }
 
     [HttpGet]
     public IActionResult Index()
     {
+        var securityCheck = CheckAdminPermissions();
+        if (securityCheck != null) return securityCheck;
+        
         List<Productos> productos = productoRepository.getProductos();
         return View(productos);
     }
@@ -23,6 +33,8 @@ public class ProductosController: Controller
     [HttpGet]
     public IActionResult Create()
     {
+        var securityCheck = CheckAdminPermissions();
+        if (securityCheck != null) return securityCheck;
         var producto = new ProductoViewModel();
         return View(producto);
     }
@@ -30,6 +42,9 @@ public class ProductosController: Controller
     [HttpPost]
     public IActionResult Create(ProductoViewModel productoVM)
     {
+        var securityCheck = CheckAdminPermissions();
+        if (securityCheck != null) return securityCheck;
+
         if (!ModelState.IsValid)
         {
             return View(productoVM);    
@@ -48,6 +63,9 @@ public class ProductosController: Controller
     [HttpGet]
     public IActionResult Edit(int id)
     {
+        var securityCheck = CheckAdminPermissions();
+        if (securityCheck != null) return securityCheck;
+
         var producto = productoRepository.getDetallesProducto(id);
         if (producto is null)
         {
@@ -69,6 +87,9 @@ public class ProductosController: Controller
     [HttpPost]
     public IActionResult Edit( ProductoViewModel productoVM)
     {   
+        var securityCheck = CheckAdminPermissions();
+        if (securityCheck != null) return securityCheck;
+
         Console.WriteLine($"ID: {productoVM.idProducto}, Desc: {productoVM.Descripcion}, Precio: {productoVM.Precio}");
 
         if (!ModelState.IsValid)
@@ -90,6 +111,9 @@ public class ProductosController: Controller
     [HttpGet]
     public IActionResult Delete(int id)
     {
+        var securityCheck = CheckAdminPermissions();
+        if (securityCheck != null) return securityCheck;
+
         var producto = productoRepository.getDetallesProducto(id);
         if (producto is null) return RedirectToAction("Index");
         return View(producto);
@@ -98,7 +122,29 @@ public class ProductosController: Controller
     [HttpPost]
     public IActionResult Delete(Productos producto)
     {
+        var securityCheck = CheckAdminPermissions();
+        if (securityCheck != null) return securityCheck;
+        
         productoRepository.deleteProducto(producto.idProducto);
         return RedirectToAction("Index");
+    }
+
+    // Private
+
+    private IActionResult CheckAdminPermissions()
+    {
+        // 1. No logueado? -> vuelve al login
+        if (!_authService.IsAuthenticated())
+        {
+            return RedirectToAction("Index", "Login");
+        }
+
+        // 2. No es Administrador? -> Da Error
+        if (!_authService.HasAccessLevel("Administrador"))
+        {
+        // Llamamos a AccesoDenegado (llama a la vista correspondiente de Productos)
+            return RedirectToAction(nameof(AccesoDenegado));
+        }
+        return null; // Permiso concedido
     }
 }
