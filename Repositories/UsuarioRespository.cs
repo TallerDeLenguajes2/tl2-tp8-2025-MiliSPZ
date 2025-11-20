@@ -5,7 +5,7 @@ using Sistema.Web.Models;
 
 using Microsoft.Data.Sqlite;
 
-public class UserRepository : IUserRepository
+public class UsuarioRepository : IUserRepository
 {
     string connectionString = "Data Source=Tienda.db";
     public Usuario getUser(string usuario, string contrasena)

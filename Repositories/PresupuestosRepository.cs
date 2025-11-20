@@ -1,4 +1,4 @@
-namespace Sistema.Web.Repository;
+namespace Sistema.Web.Repositories;
 
 using Sistema.Web.Models;
 using Sistema.Web.Interfaces;
