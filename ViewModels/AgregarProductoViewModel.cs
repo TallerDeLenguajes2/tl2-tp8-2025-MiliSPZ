@@ -1,8 +1,8 @@
+namespace Sistema.Web.ViewModels;
+
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering; 
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-
-namespace Sistema.Web.ViewModels;
 
 public class AgregarProductoViewModel
 {
