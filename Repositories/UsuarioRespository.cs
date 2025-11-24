@@ -8,10 +8,10 @@ using Microsoft.Data.Sqlite;
 public class UsuarioRepository : IUserRepository
 {
     string connectionString = "Data Source=Tienda.db";
-    public Usuario getUser(string usuario, string contrasena)
+    public Usuarios getUser(string usuario, string contrasena)
     {
         
-        Usuario user = null;
+        Usuarios user = null;
         using (var connection = new SqliteConnection(connectionString))
         {
             connection.Open();
@@ -29,7 +29,7 @@ public class UsuarioRepository : IUserRepository
                 if (reader.Read())
                 {
                     // Si el lector encuentra una fila, el usuario existe y las credenciales son correctas
-                    user = new Usuario
+                    user = new Usuarios
                     {
                         Id = reader.GetInt32(0),
                         Nombre = reader.GetString(1),

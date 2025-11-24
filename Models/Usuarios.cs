@@ -1,6 +1,6 @@
 namespace Sistema.Web.Models;
 
-public class Usuario
+public class Usuarios
 {
     public int Id { get; set; }
     public string Nombre { get; set; }
@@ -9,7 +9,7 @@ public class Usuario
     public string Rol { get; set; }
 
     // Constructores
-    public Usuario(int id, string nombre, string user, string pass, string rol)
+    public Usuarios(int id, string nombre, string user, string pass, string rol)
     {
         Id = id;
         Nombre = nombre;
@@ -18,5 +18,5 @@ public class Usuario
         Rol = rol;
     }
 
-    public Usuario() { }
+    public Usuarios() { }
 }
