@@ -15,7 +15,6 @@
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/tl2_tp8_2025_MiliSPZ.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 </head>
 <body class="bg-light">
@@ -53,21 +52,38 @@
                             </li>
                         </ul>
                     </div>
+                    <div>
+                        <a class="btn btn-outline-secondary fw-semibold gap-1 btn-sm" asp-controller="Login" asp-action="Logout">
+                            <i class="bi bi-box-arrow-right"></i> Salir
+                        </a>
+                    </div>
                 </div>
             </nav>
         </header>
     }
-    <div class="container w-100 p-3 mt-5">
-        <main role="main" class="pb-3">
+    @if (hideNavbar)
+    {
+        <main role="main" class="w-100">
             @RenderBody()
         </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - tl2_tp8_2025_MiliSPZ - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    }
+    else
+    {
+        <div class="container w-100 p-3 mt-5">
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
         </div>
-    </footer>
+    }
+
+    @if (!hideNavbar)
+    {
+        <footer class="border-top footer text-muted">
+            <div class="container">
+                &copy; 2025 - tl2_tp8_2025_MiliSPZ - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            </div>
+        </footer>
+    }
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
