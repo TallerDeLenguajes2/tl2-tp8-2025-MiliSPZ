@@ -1,0 +1,47 @@
+@model Sistema.Web.ViewModels.LoginViewModel
+
+<div class="d-flex justify-content-center align-items-center vh-100 bg-light">
+    <div style="max-width: 400px; width: 100%;" class="mx-auto">
+        <div class="card bg-dark text-white shadow-lg border-0 rounded-4">
+            <div class="card-body p-5 text-center">
+                <h2 class="fw-bold mb-2 text-uppercase">Iniciar Sesión</h2>
+                <p class="text-white-50 mb-4">Gestiona tus productos y presupuestos</p>
+
+                @if (!string.IsNullOrEmpty(Model?.ErrorMessage))
+                {
+                    <div class="alert alert-danger py-2 mb-4">
+                        @Model.ErrorMessage
+                    </div>
+                }
+
+                <form asp-action="Login" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+                    <div class="text-start d-flex flex-column gap-3">
+                        <div class="form-group">
+                            <label asp-for="User" class="control-label mb-2"></label>
+                            <input asp-for="User" class="form-control" placeholder="Nombre123" />
+                            <span asp-validation-for="User" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Pass" class="control-label mb-2"></label>
+                            <input asp-for="Pass" type="password" class="form-control" placeholder="••••••••" />
+                            <span asp-validation-for="Pass" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-4 w-100">
+                        <button type="submit" class="btn btn-primary w-100">
+                            Iniciar sesión
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -25,7 +25,6 @@ public class HomeController : Controller
 
         if (_authService.HasAccessLevel("Administrador") || _authService.HasAccessLevel("Cliente") )
         {
-            //si es es valido entra sino vuelve a login
             return View();
         }
         else
